@@ -131,7 +131,7 @@ DOCKEREOF
             steps {
                 withCredentials([
                     usernamePassword(
-                        credentialsId: 'gitea-creds',
+                        credentialsId: 'gitea-cred',
                         usernameVariable: 'GITEA_USER',
                         passwordVariable: 'GITEA_PASS'
                     )
@@ -154,7 +154,7 @@ DOCKEREOF
         failure {
             withCredentials([
                 usernamePassword(
-                    credentialsId: 'gitea-creds',
+                    credentialsId: 'gitea-cred',
                     usernameVariable: 'GITEA_USER',
                     passwordVariable: 'GITEA_PASS'
                 )

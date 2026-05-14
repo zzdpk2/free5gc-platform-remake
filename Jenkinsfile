@@ -91,7 +91,7 @@ DOCKEREOF
                                 build \
                                 --frontend dockerfile.v0 \
                                 --local context=. \
-                                --local dockerfile=docker/${NF} \
+                                --local dockerfile=NFs/${NF} \
                                 --output type=image,name=${HARBOR_URL}/${HARBOR_PROJECT}/${NF}:${IMAGE_TAG},push=true,registry.insecure=true
 
                             # TODO: Add latest tag push later.

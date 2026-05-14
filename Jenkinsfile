@@ -8,6 +8,7 @@ pipeline {
         GITEA_URL = 'http://gitea-http.gitea.svc.cluster.local:3000'
 
         // TODO: Add more network functions later.
+        // Example: amf smf ausf udm udr nssf pcf upf webconsole
         // Currently building NRF and CHF only.
         NF_LIST = 'nrf chf'
     }
@@ -16,6 +17,9 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+
+                // TODO: Keep this for all free5GC NF submodules.
+                sh 'git submodule update --init --recursive'
             }
         }
 

@@ -43,3 +43,7 @@
 [submodule "NFs/bsf"]
 	path = NFs/bsf
 	url = https://github.com/free5gc/bsf.git
+[submodule "NFs/nrf"]
+	url = ssh://git@192.168.122.101:30022/rex/nrf.git
+[submodule "NFs/chf"]
+	url = ssh://git@192.168.122.101:30022/rex/chf.git

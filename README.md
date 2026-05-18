@@ -38,3 +38,4 @@ Detailed changes for each release are documented in the [release notes](https://
 
 free5GC is now under [Apache 2.0](https://github.com/free5gc/free5gc/blob/master/LICENSE.txt) license.
 
+# trigger CI Fri May 15 11:35:17 PM CST 2026

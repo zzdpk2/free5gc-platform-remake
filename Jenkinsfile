@@ -57,8 +57,12 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    // TODO: Integrate real sonar-scanner later.
-                    sh 'echo "SonarQube scan placeholder"'
+                    sh '''
+                        sonar-scanner \
+                          -Dsonar.projectKey=free5gc-platform \
+                          -Dsonar.sources=. \
+                          -Dsonar.sourceEncoding=UTF-8
+                    '''
                 }
             }
         }

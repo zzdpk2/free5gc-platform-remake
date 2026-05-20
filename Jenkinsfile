@@ -57,10 +57,9 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
+                    def scannerHome = tool 'sonar-scanner'
                     sh '''
-    export PATH=$PATH:${tool "sonar-scanner"}/bin
-
-                        sonar-scanner \
+                            ${scannerHome}/bin/sonar-scanner \
                           -Dsonar.projectKey=free5gc-platform \
                           -Dsonar.sources=. \
                           -Dsonar.sourceEncoding=UTF-8

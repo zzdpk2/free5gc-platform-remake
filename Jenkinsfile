@@ -57,19 +57,15 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        if [ ! -f /tmp/sonar-scanner/bin/sonar-scanner ]; then
-                            curl -sL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip -o /tmp/sonar-scanner.zip
-                            unzip -q /tmp/sonar-scanner.zip -d /tmp/
-                            rm -rf /tmp/sonar-scanner
-                            mv /tmp/sonar-scanner-5.0.1.3006-linux /tmp/sonar-scanner
-                        fi
-
-                        /tmp/sonar-scanner/bin/sonar-scanner \
-                          -Dsonar.projectKey=free5gc-platform \
-                          -Dsonar.sources=. \
-                          -Dsonar.sourceEncoding=UTF-8
-                    '''
+                    script {
+                        def scannerHome = tool 'sonar-scanner'
+                        sh """
+                            \${scannerHome}/bin/sonar-scanner \\
+                              -Dsonar.projectKey=free5gc-platform \\
+                              -Dsonar.sources=. \\
+                              -Dsonar.sourceEncoding=UTF-8
+                        """
+                    }
                 }
             }
         }

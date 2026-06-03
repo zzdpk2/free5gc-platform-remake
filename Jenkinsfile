@@ -57,8 +57,24 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    // TODO: Integrate real sonar-scanner later.
-                    sh 'echo "SonarQube scan placeholder"'
+                    withCredentials([string(credentialsId: 'sonarqube-token1', variable: 'SONAR_TOKEN')]) {
+                        sh '''
+                            if [ ! -f /tmp/sonar-scanner/bin/sonar-scanner ]; then
+                                curl -sL https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip -o /tmp/sonar-scanner.zip
+                                unzip -q /tmp/sonar-scanner.zip -d /tmp/
+                                rm -rf /tmp/sonar-scanner
+                                mv /tmp/sonar-scanner-5.0.1.3006-linux /tmp/sonar-scanner
+                            fi
+
+                            /tmp/sonar-scanner/bin/sonar-scanner \
+                              -Dsonar.projectKey=free5gc-platform \
+                              -Dsonar.sources=. \
+                              -Dsonar.sourceEncoding=UTF-8 \
+                              -Dsonar.token=${SONAR_TOKEN} \
+                              -Dsonar.exclusions='**/vendor/**,**/node_modules/**,**/test/**,**/*_test.go,**/cdr/cdrType/**,**/ccs_diameter/**,webconsole/frontend/**' \
+                              -Dsonar.go.exclusions='**/vendor/**'
+                        '''
+                    }
                 }
             }
         }
@@ -127,49 +143,10 @@ DOCKEREOF
             }
         }
 
-        stage('Update Gitea Status') {
-            steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'gitea-cred',
-                        usernameVariable: 'GITEA_USER',
-                        passwordVariable: 'GITEA_PASS'
-                    )
-                ]) {
-                    sh '''
-                        COMMIT=$(git rev-parse HEAD)
-
-                        curl -s -X POST \
-                            "${GITEA_URL}/api/v1/repos/rex/free5gc-platform/statuses/${COMMIT}" \
-                            -H "Content-Type: application/json" \
-                            -u "${GITEA_USER}:${GITEA_PASS}" \
-                            -d "{\\"state\\":\\"success\\",\\"context\\":\\"jenkins-ci\\",\\"description\\":\\"Build ${BUILD_NUMBER} passed\\",\\"target_url\\":\\"${BUILD_URL}\\"}"
-                    '''
-                }
-            }
-        }
     }
 
     post {
         failure {
-            withCredentials([
-                usernamePassword(
-                    credentialsId: 'gitea-cred',
-                    usernameVariable: 'GITEA_USER',
-                    passwordVariable: 'GITEA_PASS'
-                )
-            ]) {
-                sh '''
-                    COMMIT=$(git rev-parse HEAD)
-
-                    curl -s -X POST \
-                        "${GITEA_URL}/api/v1/repos/rex/free5gc-platform/statuses/${COMMIT}" \
-                        -H "Content-Type: application/json" \
-                        -u "${GITEA_USER}:${GITEA_PASS}" \
-                        -d "{\\"state\\":\\"failure\\",\\"context\\":\\"jenkins-ci\\",\\"description\\":\\"Build ${BUILD_NUMBER} failed\\",\\"target_url\\":\\"${BUILD_URL}\\"}"
-                '''
-            }
-
             echo "Pipeline FAILED"
         }
 

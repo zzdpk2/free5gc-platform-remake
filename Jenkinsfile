@@ -141,49 +141,10 @@ DOCKEREOF
             }
         }
 
-        stage('Update Gitea Status') {
-            steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'gitea-cred',
-                        usernameVariable: 'GITEA_USER',
-                        passwordVariable: 'GITEA_PASS'
-                    )
-                ]) {
-                    sh '''
-                        COMMIT=$(git rev-parse HEAD)
-
-                        curl -s -X POST \
-                            "${GITEA_URL}/api/v1/repos/rex/free5gc-platform/statuses/${COMMIT}" \
-                            -H "Content-Type: application/json" \
-                            -u "${GITEA_USER}:${GITEA_PASS}" \
-                            -d "{\\"state\\":\\"success\\",\\"context\\":\\"jenkins-ci\\",\\"description\\":\\"Build ${BUILD_NUMBER} passed\\",\\"target_url\\":\\"${BUILD_URL}\\"}"
-                    '''
-                }
-            }
-        }
     }
 
     post {
         failure {
-            withCredentials([
-                usernamePassword(
-                    credentialsId: 'gitea-cred',
-                    usernameVariable: 'GITEA_USER',
-                    passwordVariable: 'GITEA_PASS'
-                )
-            ]) {
-                sh '''
-                    COMMIT=$(git rev-parse HEAD)
-
-                    curl -s -X POST \
-                        "${GITEA_URL}/api/v1/repos/rex/free5gc-platform/statuses/${COMMIT}" \
-                        -H "Content-Type: application/json" \
-                        -u "${GITEA_USER}:${GITEA_PASS}" \
-                        -d "{\\"state\\":\\"failure\\",\\"context\\":\\"jenkins-ci\\",\\"description\\":\\"Build ${BUILD_NUMBER} failed\\",\\"target_url\\":\\"${BUILD_URL}\\"}"
-                '''
-            }
-
             echo "Pipeline FAILED"
         }
 

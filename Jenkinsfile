@@ -70,7 +70,9 @@ pipeline {
                               -Dsonar.projectKey=free5gc-platform \
                               -Dsonar.sources=. \
                               -Dsonar.sourceEncoding=UTF-8 \
-                              -Dsonar.token=${SONAR_TOKEN}
+                              -Dsonar.token=${SONAR_TOKEN} \
+                              -Dsonar.exclusions='**/vendor/**,**/node_modules/**,**/test/**,**/*_test.go,**/cdr/cdrType/**,**/ccs_diameter/**,webconsole/frontend/**' \
+                              -Dsonar.go.exclusions='**/vendor/**'
                         '''
                     }
                 }

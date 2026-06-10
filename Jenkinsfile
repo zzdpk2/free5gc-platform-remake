@@ -92,6 +92,8 @@ pipeline {
                     )
                 ]) {
                     sh '''
+                        export BUILDKIT_NO_CLIENT_TOKEN=true
+
                         if [ ! -f /tmp/buildctl ]; then
                             curl -sL https://github.com/moby/buildkit/releases/download/v0.13.2/buildkit-v0.13.2.linux-amd64.tar.gz | tar -xz -C /tmp/ bin/buildctl --strip-components=1
                         fi

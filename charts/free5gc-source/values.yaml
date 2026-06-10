@@ -1,0 +1,118 @@
+image:
+  registry: 192.168.122.202
+  project: free5gc
+  tag: source
+  pullPolicy: IfNotPresent
+  pullSecrets:
+    - harbor-pull
+
+mongodb:
+  enabled: true
+  image: mongo:8.0
+  storageClassName: openebs-hostpath
+  size: 8Gi
+
+spread:
+  enabled: true
+
+kyverno:
+  allowPrivilegedUpf: true
+
+nfs:
+  nrf:
+    replicas: 1
+    hostNetwork: false
+    ports:
+      - name: sbi
+        port: 8000
+        protocol: TCP
+  amf:
+    replicas: 1
+    hostNetwork: true
+    ports:
+      - name: sbi
+        port: 8000
+        protocol: TCP
+      - name: ngap
+        port: 38412
+        protocol: SCTP
+  smf:
+    replicas: 1
+    hostNetwork: false
+    ports:
+      - name: sbi
+        port: 8000
+        protocol: TCP
+      - name: pfcp
+        port: 8805
+        protocol: UDP
+  upf:
+    replicas: 1
+    hostNetwork: true
+    privileged: true
+    ports:
+      - name: pfcp
+        port: 8805
+        protocol: UDP
+      - name: gtpu
+        port: 2152
+        protocol: UDP
+  ausf:
+    replicas: 1
+    hostNetwork: false
+    ports:
+      - name: sbi
+        port: 8000
+        protocol: TCP
+  bsf:
+    replicas: 1
+    hostNetwork: false
+    ports:
+      - name: sbi
+        port: 8000
+        protocol: TCP
+  nssf:
+    replicas: 1
+    hostNetwork: false
+    ports:
+      - name: sbi
+        port: 8000
+        protocol: TCP
+  pcf:
+    replicas: 1
+    hostNetwork: false
+    ports:
+      - name: sbi
+        port: 8000
+        protocol: TCP
+  udm:
+    replicas: 1
+    hostNetwork: false
+    ports:
+      - name: sbi
+        port: 8000
+        protocol: TCP
+  udr:
+    replicas: 1
+    hostNetwork: false
+    ports:
+      - name: sbi
+        port: 8000
+        protocol: TCP
+  chf:
+    replicas: 1
+    hostNetwork: false
+    ports:
+      - name: sbi
+        port: 8000
+        protocol: TCP
+      - name: ftp
+        port: 2122
+        protocol: TCP
+  nef:
+    replicas: 1
+    hostNetwork: false
+    ports:
+      - name: sbi
+        port: 8000
+        protocol: TCP

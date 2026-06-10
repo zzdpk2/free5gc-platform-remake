@@ -1,0 +1,6 @@
+apiVersion: v2
+name: free5gc-source
+description: free5GC source-built microservices for the KVM Kubernetes platform
+type: application
+version: 0.1.0
+appVersion: source

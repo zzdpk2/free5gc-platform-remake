@@ -1,0 +1,91 @@
+{{- range $name, $nf := .Values.nfs }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: free5gc-{{ $name }}
+  namespace: free5gc
+  labels:
+    app.kubernetes.io/name: free5gc
+    app.kubernetes.io/component: {{ $name }}
+spec:
+  selector:
+    app.kubernetes.io/name: free5gc
+    app.kubernetes.io/component: {{ $name }}
+  ports:
+{{- range $port := $nf.ports }}
+    - name: {{ $port.name }}
+      port: {{ $port.port }}
+      targetPort: {{ $port.port }}
+      protocol: {{ $port.protocol }}
+{{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: free5gc-{{ $name }}
+  namespace: free5gc
+  labels:
+    app.kubernetes.io/name: free5gc
+    app.kubernetes.io/component: {{ $name }}
+spec:
+  replicas: {{ $nf.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: free5gc
+      app.kubernetes.io/component: {{ $name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: free5gc
+        app.kubernetes.io/component: {{ $name }}
+    spec:
+      {{- if $nf.hostNetwork }}
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      {{- end }}
+      {{- if $.Values.spread.enabled }}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: free5gc
+      {{- end }}
+      {{- if $.Values.image.pullSecrets }}
+      imagePullSecrets:
+{{- range $secret := $.Values.image.pullSecrets }}
+        - name: {{ $secret }}
+{{- end }}
+      {{- end }}
+      containers:
+        - name: {{ $name }}
+          image: "{{ $.Values.image.registry }}/{{ $.Values.image.project }}/{{ $name }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          env:
+            - name: NF
+              value: {{ $name | quote }}
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+          securityContext:
+            {{- if $nf.privileged }}
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "NET_RAW"]
+            {{- else }}
+            privileged: false
+            {{- end }}
+          ports:
+{{- range $port := $nf.ports }}
+            - name: {{ $port.name }}
+              containerPort: {{ $port.port }}
+              protocol: {{ $port.protocol }}
+{{- end }}
+{{- end }}

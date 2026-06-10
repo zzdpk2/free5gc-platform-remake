@@ -1,0 +1,22 @@
+{{- if .Values.kyverno.allowPrivilegedUpf }}
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: free5gc-upf-privileged
+  namespace: free5gc
+spec:
+  exceptions:
+    - policyName: disallow-privileged
+      ruleNames:
+        - deny-privileged
+        - autogen-deny-privileged
+  match:
+    any:
+      - resources:
+          kinds:
+            - Deployment
+          namespaces:
+            - free5gc
+          names:
+            - free5gc-upf
+{{- end }}

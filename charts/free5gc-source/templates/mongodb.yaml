@@ -1,0 +1,55 @@
+{{- if .Values.mongodb.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: free5gc-mongodb
+  namespace: free5gc
+spec:
+  selector:
+    app.kubernetes.io/name: free5gc-mongodb
+  ports:
+    - name: mongodb
+      port: 27017
+      targetPort: 27017
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: free5gc-mongodb
+  namespace: free5gc
+spec:
+  serviceName: free5gc-mongodb
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: free5gc-mongodb
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: free5gc-mongodb
+    spec:
+      {{- if .Values.image.pullSecrets }}
+      imagePullSecrets:
+{{- range $secret := .Values.image.pullSecrets }}
+        - name: {{ $secret }}
+{{- end }}
+      {{- end }}
+      containers:
+        - name: mongodb
+          image: {{ .Values.mongodb.image | quote }}
+          ports:
+            - containerPort: 27017
+              name: mongodb
+          volumeMounts:
+            - name: data
+              mountPath: /data/db
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: {{ .Values.mongodb.storageClassName | quote }}
+        resources:
+          requests:
+            storage: {{ .Values.mongodb.size | quote }}
+{{- end }}

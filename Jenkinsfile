@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        HARBOR_URL = 'harbor.harbor.svc.cluster.local'
+        HARBOR_URL = 'harbor.harbor.svc.cluster.local:80'
         HARBOR_PROJECT = 'free5gc'
         IMAGE_TAG = "${BUILD_NUMBER}"
         GITEA_URL = 'http://gitea-http.gitea.svc.cluster.local:3000'
